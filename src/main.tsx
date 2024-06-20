@@ -18,6 +18,7 @@ const router = createBrowserRouter([
     element: <div>Manage Tracks</div>,
   },
 ]);
+const a = 2;
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
