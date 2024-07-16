@@ -12,6 +12,8 @@ import UsersPage from "./screens/users.page.tsx";
 import { TeamOutlined, FireOutlined } from "@ant-design/icons";
 import type { MenuProps } from "antd";
 import { Menu } from "antd";
+import "./App.scss";
+
 type MenuItem = Required<MenuProps>["items"][number];
 
 const items: MenuItem[] = [
