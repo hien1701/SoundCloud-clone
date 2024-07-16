@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-// import "../../styles/users.css";
-import { Space, Table, Tag } from "antd";
+import { Modal, Table, Button } from "antd";
 import type { TableProps } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
 
 interface IUser {
   _id: string;
@@ -19,6 +19,19 @@ interface IUser {
 
 const UsersTable = () => {
   const [listUsers, setListUsers] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const showModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleOk = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
 
   useEffect(() => {
     getData();
@@ -60,28 +73,32 @@ const UsersTable = () => {
 
   return (
     <div>
-      <h2>Table User</h2>
-      <Table columns={columns} dataSource={listUsers} />
-      {/* <table>
-        <thead>
-          <tr>
-            <td>Email</td>
-            <td>Name</td>
-            <td>Role</td>
-          </tr>
-        </thead>
-        <tbody>
-          {listUsers.map((user: IUser) => {
-            return (
-              <tr key={user._id}>
-                <td>{user.email}</td>
-                <td>{user.name}</td>
-                <td>{user.role}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table> */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h2>Table User</h2>
+        <div>
+          <Button onClick={showModal} type={"primary"} icon={<PlusOutlined />}>
+            Add new
+          </Button>
+        </div>
+      </div>
+
+      <Table rowKey={"_id"} columns={columns} dataSource={listUsers} />
+      <Modal
+        title="Basic Modal"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+      >
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+        <p>Some contents...</p>
+      </Modal>
     </div>
   );
 };
