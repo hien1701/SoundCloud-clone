@@ -6,6 +6,7 @@ interface UpdateUserModalProps {
   isModalOpen: boolean;
   setIsModalOpen?: (isOpen: boolean) => void;
   getData?: () => Promise<void>;
+  handleCloseModal?: () => void;
   currentInfo?: {
     name: string;
     role: string;
@@ -21,6 +22,7 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
   isModalOpen,
   setIsModalOpen,
   getData,
+  handleCloseModal,
   currentInfo,
 }) => {
   const [name, setName] = useState<string>("");
@@ -39,7 +41,7 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
       setAddress(currentInfo.address);
       setRole(currentInfo.role);
     }
-  }, [currentInfo]);
+  }, [currentInfo, setIsModalOpen]);
 
   const handleOk = async () => {
     const params = {
@@ -83,6 +85,7 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
     setGender("");
     setAddress("");
     setRole("");
+    handleCloseModal && handleCloseModal();
   };
 
   return (

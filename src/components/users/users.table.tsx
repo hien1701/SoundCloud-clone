@@ -66,7 +66,7 @@ const UsersTable = () => {
     },
     {
       title: "Actions",
-      render: (value, record) => {
+      render: (_, record) => {
         return (
           <div>
             <button
@@ -113,6 +113,7 @@ const UsersTable = () => {
         setIsModalOpen={setIsUpdateModalOpen}
         getData={getData}
         currentInfo={currentInfo}
+        handleCloseModal={() => setCurrentInfo(undefined)}
       />
     </div>
   );
