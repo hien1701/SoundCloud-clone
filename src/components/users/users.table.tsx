@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react";
-import { Table, Button, notification, message, Popconfirm } from "antd";
+import {
+  Table,
+  Button,
+  notification,
+  message,
+  Popconfirm,
+  Pagination,
+} from "antd";
 import type { TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CreateUserModal from "./create.user.modal";
@@ -19,14 +26,15 @@ interface IUser {
   address: string;
   password: string;
 }
-const accessToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ0b2tlbiBsb2dpbiIsImlzcyI6ImZyb20gc2VydmVyIiwiX2lkIjoiNjY3MmQ4ODg1M2RhOWQyYzM4NjhjZTMwIiwiZW1haWwiOiJhZG1pbkBnbWFpbC5jb20iLCJhZGRyZXNzIjoiVmlldE5hbSIsImlzVmVyaWZ5Ijp0cnVlLCJuYW1lIjoiSSdtIGFkbWluIiwidHlwZSI6IlNZU1RFTSIsInJvbGUiOiJBRE1JTiIsImdlbmRlciI6Ik1BTEUiLCJhZ2UiOjY5LCJpYXQiOjE3MjQwMzM0MjEsImV4cCI6MTgxMDQzMzQyMX0.mJp2dtu-aea87TNhewZZ_mpHgfvGAiT-CXHD3KAnw44";
+const accessToken = localStorage.getItem("access_token") ?? "";
 
 const UsersTable = () => {
   const [listUsers, setListUsers] = useState([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [currentInfo, setCurrentInfo] = useState<any>(undefined);
+  const [totalUser, setTotalUser] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     getData();
@@ -36,13 +44,16 @@ const UsersTable = () => {
     setIsCreateModalOpen(true);
   };
 
-  const getData = async () => {
-    const responseUser = await fetch("http://localhost:8000/api/v1/users/all", {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
+  const getData = async (current: number = 1, pageSize: number = 10) => {
+    const responseUser = await fetch(
+      `http://localhost:8000/api/v1/users?current=${current}&pageSize=${pageSize}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
     const users = await responseUser.json();
     if (!users.data) {
       notification.error({
@@ -50,6 +61,7 @@ const UsersTable = () => {
       });
     }
     setListUsers(users.data.result);
+    setTotalUser(users.data.meta.total);
   };
 
   const _onConfirmDeleteUser = async (_id: string, userName: string) => {
@@ -135,8 +147,21 @@ const UsersTable = () => {
           </Button>
         </div>
       </div>
-
-      <Table rowKey={"_id"} columns={columns} dataSource={listUsers} />
+      <Table
+        pagination={false}
+        rowKey={"_id"}
+        columns={columns}
+        dataSource={listUsers}
+      />
+      <Pagination
+        total={totalUser}
+        showTotal={(total) => `Total ${total} items`}
+        current={currentPage}
+        onChange={async (page) => {
+          setCurrentPage(page);
+          await getData(page);
+        }}
+      />
       <CreateUserModal
         accessToken={accessToken}
         isModalOpen={isCreateModalOpen}
