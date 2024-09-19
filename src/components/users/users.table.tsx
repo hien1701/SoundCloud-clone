@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button, notification } from "antd";
+import { Table, Button, notification, message, Popconfirm } from "antd";
 import type { TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CreateUserModal from "./create.user.modal";
@@ -52,6 +52,26 @@ const UsersTable = () => {
     setListUsers(users.data.result);
   };
 
+  const _onConfirmDeleteUser = async (_id: string, userName: string) => {
+    const responseUser = await fetch(
+      `http://localhost:8000/api/v1/users/${_id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        method: "DELETE",
+      }
+    );
+    const result = await responseUser.json();
+    if (result.data) {
+      message.success(`Delete user ${userName} success!`);
+      await getData();
+    } else {
+      message.error("Delete user failed!");
+    }
+  };
+
   const columns: TableProps<IUser>["columns"] = [
     {
       title: "Email",
@@ -74,14 +94,25 @@ const UsersTable = () => {
       render: (_, record) => {
         return (
           <div>
-            <button
+            <Button
               onClick={() => {
                 setCurrentInfo(record);
                 setIsUpdateModalOpen(true);
               }}
             >
               Edit
-            </button>
+            </Button>
+            <Popconfirm
+              title="Delete a user"
+              description={`Are you sure to delete this user (${record.name})?`}
+              onConfirm={() => _onConfirmDeleteUser(record._id, record.name)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <Button style={{ marginLeft: 10 }} danger>
+                Delete
+              </Button>
+            </Popconfirm>
           </div>
         );
       },
