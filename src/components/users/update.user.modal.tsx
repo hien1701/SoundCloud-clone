@@ -14,6 +14,7 @@ interface UpdateUserModalProps {
     email: string;
     age: string;
     address: string;
+    _id: string;
   };
 }
 
@@ -51,13 +52,14 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
       gender,
       address,
       role,
+      _id: currentInfo?._id,
     };
     const responseUser = await fetch("http://localhost:8000/api/v1/users", {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
       },
-      method: "POST",
+      method: "PATCH",
       body: JSON.stringify(params),
     });
     const result = await responseUser.json();

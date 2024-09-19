@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Table, Button } from "antd";
+import { Table, Button, notification } from "antd";
 import type { TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CreateUserModal from "./create.user.modal";
@@ -44,6 +44,11 @@ const UsersTable = () => {
       },
     });
     const users = await responseUser.json();
+    if (!users.data) {
+      notification.error({
+        message: JSON.stringify(users.message),
+      });
+    }
     setListUsers(users.data.result);
   };
 
