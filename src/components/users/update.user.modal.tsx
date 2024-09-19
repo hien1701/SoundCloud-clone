@@ -68,7 +68,7 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
         await getData();
       }
       notification.success({
-        message: "Tạo mới user thành công",
+        message: "Cập nhật thông tin user thành công",
       });
     } else {
       notification.error({
