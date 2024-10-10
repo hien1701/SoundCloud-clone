@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Table,
-  Button,
-  notification,
-  message,
-  Popconfirm,
-  Pagination,
-} from "antd";
+import { Table, Button, notification, message, Popconfirm } from "antd";
 import type { TableProps } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CreateUserModal from "./create.user.modal";
@@ -33,20 +26,24 @@ const UsersTable = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [currentInfo, setCurrentInfo] = useState<any>(undefined);
-  const [totalUser, setTotalUser] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [meta, setMeta] = useState({
+    current: 1,
+    pageSize: 10,
+    pages: 0,
+    total: 0,
+  });
 
   useEffect(() => {
     getData();
-  }, []);
+  }, [meta.current]);
 
   const showModal = () => {
     setIsCreateModalOpen(true);
   };
 
-  const getData = async (current: number = 1, pageSize: number = 10) => {
+  const getData = async () => {
     const responseUser = await fetch(
-      `http://localhost:8000/api/v1/users?current=${current}&pageSize=${pageSize}`,
+      `http://localhost:8000/api/v1/users?current=${meta.current}&pageSize=${meta.pageSize}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -61,7 +58,12 @@ const UsersTable = () => {
       });
     }
     setListUsers(users.data.result);
-    setTotalUser(users.data.meta.total);
+    setMeta({
+      current: users.data.meta.current,
+      pageSize: users.data.meta.pageSize,
+      pages: users.data.meta.pages,
+      total: users.data.meta.total,
+    });
   };
 
   const _onConfirmDeleteUser = async (_id: string, userName: string) => {
@@ -148,18 +150,16 @@ const UsersTable = () => {
         </div>
       </div>
       <Table
-        pagination={false}
         rowKey={"_id"}
         columns={columns}
         dataSource={listUsers}
-      />
-      <Pagination
-        total={totalUser}
-        showTotal={(total) => `Total ${total} items`}
-        current={currentPage}
-        onChange={async (page) => {
-          setCurrentPage(page);
-          await getData(page);
+        pagination={{
+          current: meta.current,
+          total: meta.total,
+          pageSize: meta.pageSize,
+          onChange: async (page) => {
+            setMeta({ ...meta, current: page });
+          },
         }}
       />
       <CreateUserModal
