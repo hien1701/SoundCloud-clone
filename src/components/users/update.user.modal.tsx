@@ -1,5 +1,5 @@
-import { Input, Modal, notification } from "antd";
-import { FC, useEffect, useState } from "react";
+import { Form, Input, InputNumber, Modal, Select, notification } from "antd";
+import { FC, useEffect } from "react";
 
 interface UpdateUserModalProps {
   accessToken: string;
@@ -18,6 +18,8 @@ interface UpdateUserModalProps {
   };
 }
 
+const { Option } = Select;
+
 const UpdateUserModal: FC<UpdateUserModalProps> = ({
   accessToken,
   isModalOpen,
@@ -26,25 +28,27 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
   handleCloseModal,
   currentInfo,
 }) => {
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [age, setAge] = useState<string>("");
-  const [gender, setGender] = useState<string>("");
-  const [address, setAddress] = useState<string>("");
-  const [role, setRole] = useState<string>("");
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (currentInfo) {
-      setName(currentInfo.name);
-      setEmail(currentInfo.email);
-      setAge(currentInfo.age);
-      setGender(currentInfo.gender);
-      setAddress(currentInfo.address);
-      setRole(currentInfo.role);
+      form.setFieldsValue({
+        name: currentInfo.name,
+        email: currentInfo.email,
+        age: currentInfo.age,
+        gender: currentInfo.gender,
+        address: currentInfo.address,
+        role: currentInfo.role,
+      });
     }
-  }, [currentInfo, setIsModalOpen]);
+  }, [currentInfo]);
 
   const handleOk = async () => {
+    form.submit();
+  };
+
+  const onFinish = async (values: any) => {
+    const { name, email, age, gender, address, role } = values;
     const params = {
       name,
       email,
@@ -81,12 +85,6 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
 
   const handleCancel = () => {
     setIsModalOpen && setIsModalOpen(false);
-    setName("");
-    setEmail("");
-    setAge("");
-    setGender("");
-    setAddress("");
-    setRole("");
     handleCloseModal && handleCloseModal();
   };
 
@@ -97,39 +95,82 @@ const UpdateUserModal: FC<UpdateUserModalProps> = ({
       onOk={handleOk}
       onCancel={handleCancel}
     >
-      <div>
-        <label>Name</label>
-        <Input value={name} onChange={(event) => setName(event.target.value)} />
-      </div>
-      <div>
-        <label>Email</label>
-        <Input
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-        />
-      </div>
-      <div>
-        <label>Age</label>
-        <Input value={age} onChange={(event) => setAge(event.target.value)} />
-      </div>
-      <div>
-        <label>Gender</label>
-        <Input
-          value={gender}
-          onChange={(event) => setGender(event.target.value)}
-        />
-      </div>
-      <div>
-        <label>Address</label>
-        <Input
-          value={address}
-          onChange={(event) => setAddress(event.target.value)}
-        />
-      </div>
-      <div>
-        <label>Role</label>
-        <Input value={role} onChange={(event) => setRole(event.target.value)} />
-      </div>
+      <Form form={form} name="basic" onFinish={onFinish} layout={"vertical"}>
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          label="Username"
+          name="name"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          label="Password"
+          name="password"
+          rules={[
+            {
+              required: currentInfo ? false : true,
+              message: "Please input your password!",
+            },
+          ]}
+        >
+          <Input.Password disabled={currentInfo ? true : false} />
+        </Form.Item>
+
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          label="Age"
+          name="age"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <InputNumber style={{ width: "100%" }} />
+        </Form.Item>
+
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          label="Address"
+          name="address"
+          rules={[{ required: true, message: "Please input your username!" }]}
+        >
+          <Input />
+        </Form.Item>
+
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          name="gender"
+          label="Gender"
+          rules={[{ required: true }]}
+        >
+          <Select placeholder="Select a gender" allowClear>
+            <Option value="male">male</Option>
+            <Option value="female">female</Option>
+            <Option value="other">other</Option>
+          </Select>
+        </Form.Item>
+
+        <Form.Item
+          style={{ marginBottom: 5 }}
+          name="role"
+          label="Role"
+          rules={[{ required: true }]}
+        >
+          <Select placeholder="Select a role" allowClear>
+            <Option value="admin">Admin</Option>
+            <Option value="user">User</Option>
+          </Select>
+        </Form.Item>
+      </Form>
     </Modal>
   );
 };
